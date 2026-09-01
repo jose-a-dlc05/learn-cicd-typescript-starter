@@ -8,6 +8,7 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
       - name: Check out code
@@ -23,3 +24,14 @@ jobs:
 
       - name: Build app
         run: npm run build
+
+      - id: "auth"
+        uses: "google-github-actions/auth@v2"
+        with:
+          credentials_json: "${{ secrets.GCP_CREDENTIALS }}"
+
+      - name: "Set up Cloud SDK"
+        uses: "google-github-actions/setup-gcloud@v3"
+
+      - name: "Build and Push Container Image"
+        run: "gcloud builds submit --tag northamerica-northeast1-docker.pkg.dev/marine-shell-505805-f3/notely-ar-repo/notely:latest ."
