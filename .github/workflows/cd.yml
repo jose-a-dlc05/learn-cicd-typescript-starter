@@ -9,6 +9,8 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
     steps:
       - name: Check out code
@@ -35,6 +37,9 @@ jobs:
 
       - name: "Build and Push Container Image"
         run: "gcloud builds submit --tag northamerica-northeast1-docker.pkg.dev/marine-shell-505805-f3/notely-ar-repo/notely:latest ."
+
+      - name: Run migrations
+        run: npm run db:migrate
 
       - name: Deploy to Cloud Run
         run: gcloud run deploy notely --image northamerica-northeast1-docker.pkg.dev/marine-shell-505805-f3/notely-ar-repo/notely:latest --region northamerica-northeast1 --allow-unauthenticated --project marine-shell-505805-f3 --max-instances=4
